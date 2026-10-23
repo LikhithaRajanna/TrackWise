@@ -1,21 +1,18 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 from database import (
     create_table,
     save_event,
     save_event_error,
-    save_event_attempt
+    save_event_attempt,
+    get_connection,
+    execute_query
 )
 import sqlite3
+import psycopg
 import time
-import os
-from flask import render_template
-
-DATABASE_NAME = os.environ.get(
-    "TRACKWISE_DATABASE",
-    "trackwise.db"
-)
 
 app = Flask(__name__)
+
 
 def save_event_with_retry(
     user_id,
@@ -33,13 +30,18 @@ def save_event_with_retry(
                 client_event_id
             )
 
-        except sqlite3.OperationalError as error:
+        except (sqlite3.OperationalError, psycopg.Error) as error:
             error_message = str(error).lower()
 
-            if (
-                "locked" not in error_message
-                and "busy" not in error_message
-            ):
+            is_temporary_error = (
+                "locked" in error_message
+                or "busy" in error_message
+                or "deadlock" in error_message
+                or "serialization failure" in error_message
+                or "could not obtain lock" in error_message
+            )
+
+            if not is_temporary_error:
                 raise
 
             if attempt == max_attempts:
@@ -56,18 +58,12 @@ def save_event_with_retry(
             time.sleep(delay)
 
 
-
-
 @app.route("/api/health", methods=["GET"])
 def health_check():
     connection = None
 
     try:
-        connection = sqlite3.connect(
-            DATABASE_NAME,
-            timeout=3
-        )
-
+        connection = get_connection()
         connection.execute("SELECT 1")
 
         return jsonify({
@@ -76,7 +72,7 @@ def health_check():
             "database": "connected"
         }), 200
 
-    except sqlite3.Error:
+    except Exception:
         app.logger.exception("Health check failed")
 
         return jsonify({
@@ -255,7 +251,7 @@ def receive_event():
 
 @app.route("/api/events", methods=["GET"])
 def get_events():
-    connection = sqlite3.connect(DATABASE_NAME)
+    connection = get_connection()
     connection.row_factory = sqlite3.Row
 
     try:
@@ -282,7 +278,7 @@ def get_events():
 
         query += " ORDER BY id DESC"
 
-        cursor.execute(query, parameters)
+        execute_query(cursor, query, parameters)
 
         rows = cursor.fetchall()
         events = [dict(row) for row in rows]
@@ -297,7 +293,7 @@ def get_events():
 
 @app.route("/api/analytics", methods=["GET"])
 def get_analytics():
-    connection = sqlite3.connect(DATABASE_NAME)
+    connection = get_connection()
     connection.row_factory = sqlite3.Row
 
     try:
@@ -359,7 +355,7 @@ def get_analytics():
 
 @app.route("/api/monitoring", methods=["GET"])
 def get_monitoring():
-    connection = sqlite3.connect(DATABASE_NAME)
+    connection = get_connection()
     connection.row_factory = sqlite3.Row
 
     try:
@@ -417,7 +413,7 @@ def get_monitoring():
 
 @app.route("/api/attempts", methods=["GET"])
 def get_event_attempts():
-    connection = sqlite3.connect(DATABASE_NAME)
+    connection = get_connection()
     connection.row_factory = sqlite3.Row
 
     try:
@@ -452,7 +448,7 @@ def get_event_attempts():
 
         query += " ORDER BY id DESC"
 
-        cursor.execute(query, parameters)
+        execute_query(cursor, query, parameters)
         attempts = [dict(row) for row in cursor.fetchall()]
 
         return jsonify({
@@ -466,7 +462,7 @@ def get_event_attempts():
 
 @app.route("/api/errors", methods=["GET"])
 def get_event_errors():
-    connection = sqlite3.connect(DATABASE_NAME)
+    connection = get_connection()
     connection.row_factory = sqlite3.Row
 
     try:
