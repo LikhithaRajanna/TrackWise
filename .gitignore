@@ -1,0 +1,29 @@
+
+# Python virtual environment
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+
+# Test cache
+.pytest_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+
+# SQLite databases and backups
+*.db
+*.sqlite
+*.sqlite3
+
+# Local backup copies of source files
+app_backup.py
+database_backup.py
+
+# Editor and operating system files
+.vscode/
+.DS_Store
+templates/*backup*.html

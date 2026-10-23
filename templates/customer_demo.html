@@ -1,0 +1,287 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrackWise - Customer Demo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 24px 8%;
+        }
+
+        header h1 {
+            margin: 0 0 8px;
+        }
+
+        header p {
+            margin: 0;
+            color: #dbeafe;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section-heading {
+            margin-bottom: 20px;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 20px;
+        }
+
+        .product {
+            background: white;
+            border-radius: 12px;
+            padding: 22px;
+            border: 1px solid #e5e7eb;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+        }
+
+        .product h3 {
+            margin-top: 0;
+        }
+
+        .product-id {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 18px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 11px;
+            margin-top: 9px;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .view-button {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .purchase-button {
+            background: #1d4ed8;
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: wait;
+        }
+
+        .monitor {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 22px;
+            margin-top: 28px;
+        }
+
+        #eventStatus {
+            padding: 12px;
+            border-radius: 7px;
+            background: #f1f5f9;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        #eventHistory {
+            padding-left: 20px;
+        }
+
+        #eventHistory li {
+            margin: 10px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .dashboard-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1d4ed8;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Customer Product Store</h1>
+        <p>A sample website integrated with the TrackWise event API</p>
+    </header>
+
+    <main>
+        <div class="section-heading">
+            <h2>Explore Products</h2>
+            <p>
+                Click a product button to send customer activity
+                to the TrackWise backend.
+            </p>
+        </div>
+
+        <section class="products">
+            <article class="product">
+                <p class="product-id">Product ID: P101</p>
+                <h3>Wireless Headphones</h3>
+                <p>Wireless audio for everyday use.</p>
+                <p class="price">₹1,499</p>
+
+                <button class="view-button"
+                    onclick="sendEvent('product_viewed', 'P101', this)">
+                    View Product
+                </button>
+
+                <button class="purchase-button"
+                    onclick="sendEvent('purchase', 'P101', this)">
+                    Purchase Product
+                </button>
+            </article>
+
+            <article class="product">
+                <p class="product-id">Product ID: P102</p>
+                <h3>Smart Watch</h3>
+                <p>A sample wearable device.</p>
+                <p class="price">₹2,499</p>
+
+                <button class="view-button"
+                    onclick="sendEvent('product_viewed', 'P102', this)">
+                    View Product
+                </button>
+
+                <button class="purchase-button"
+                    onclick="sendEvent('purchase', 'P102', this)">
+                    Purchase Product
+                </button>
+            </article>
+
+            <article class="product">
+                <p class="product-id">Product ID: P103</p>
+                <h3>Bluetooth Speaker</h3>
+                <p>Portable sound for your workspace.</p>
+                <p class="price">₹999</p>
+
+                <button class="view-button"
+                    onclick="sendEvent('product_viewed', 'P103', this)">
+                    View Product
+                </button>
+
+                <button class="purchase-button"
+                    onclick="sendEvent('purchase', 'P103', this)">
+                    Purchase Product
+                </button>
+            </article>
+        </section>
+
+        <section class="monitor">
+            <h2>Integration Status</h2>
+            <p id="eventStatus" role="status" aria-live="polite">
+                Ready to send events to TrackWise.
+            </p>
+
+            <h3>Recent Activity</h3>
+            <ul id="eventHistory"></ul>
+
+            <a class="dashboard-link" href="/dashboard">
+                Open TrackWise Monitoring Dashboard
+            </a>
+        </section>
+    </main>
+
+    <script>
+        // A fixed demo user makes repeat testing easier.
+        const demoUserId = "demo_user_001";
+
+        async function sendEvent(eventName, productId, button) {
+            const status = document.getElementById("eventStatus");
+            const history = document.getElementById("eventHistory");
+
+            button.disabled = true;
+            status.textContent = "Sending event to TrackWise...";
+
+            try {
+                
+                const response = await fetch("/api/events", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        user_id: demoUserId,
+                        event_name: eventName,
+                        product_id: productId
+                    })
+                });
+
+                
+                const responseText = await response.text();
+
+                let data;
+
+                try {
+                    data = JSON.parse(responseText);
+                } catch (error) {
+                    throw new Error(
+                        "Server returned a non-JSON response. HTTP status: " +
+                        response.status +
+                        ". Response starts with: " +
+                        responseText.slice(0, 120)
+                    );
+                }
+
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error || "The event request failed."
+                    );
+                }
+
+                status.textContent =
+                    "HTTP " + response.status + "\n" +
+                    data.message + "\n" +
+                    "Event ID: " + data.event_id + "\n" +
+                    "Status: " + data.status;
+
+                const item = document.createElement("li");
+                item.textContent =
+                    eventName + " | " + productId +
+                    " | HTTP " + response.status +
+                    " | " + data.status;
+
+                history.prepend(item);
+
+            } catch (error) {
+                status.textContent =
+                    "Unable to send event: " + error.message;
+            } finally {
+                button.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

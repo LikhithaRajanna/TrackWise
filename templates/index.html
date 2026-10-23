@@ -1,0 +1,1102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrackWise | Event Monitoring</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1e293b;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 7%;
+        }
+
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        header p {
+            color: #cbd5e1;
+            font-size: 14px;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            margin-bottom: 20px;
+        }
+
+        .section-title h2 {
+            margin-bottom: 7px;
+        }
+
+        .section-title p {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 3px 12px #0f172a08;
+            min-width: 0;
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            font-size: 30px;
+            color: #172554;
+            overflow-wrap: anywhere;
+        }
+
+        .analytics-section {
+            margin-bottom: 28px;
+        }
+
+        .analytics-section > h2 {
+            margin-bottom: 18px;
+        }
+
+        .analytics-section .stats {
+            margin-bottom: 22px;
+        }
+
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .chart-card h2 {
+            font-size: 19px;
+            margin-bottom: 18px;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        input, select, button {
+            padding: 11px 13px;
+            border-radius: 7px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+        }
+
+        input, select {
+            background: white;
+            min-width: 180px;
+        }
+
+        button {
+            background: #2563eb;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .secondary-button {
+            background: #475569;
+        }
+
+        .secondary-button:hover {
+            background: #334155;
+        }
+
+        .table-wrapper,
+        .error-table-wrapper {
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th, td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 9px;
+            background: #dcfce7;
+            color: #166534;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .outcome {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .outcome-accepted {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .outcome-duplicate {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .outcome-rejected,
+        .outcome-error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        #message,
+        .analytics-message {
+            color: #64748b;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .error-section {
+            margin-top: 28px;
+        }
+
+        .error-section h2 {
+            margin-bottom: 18px;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 30px 15px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 20px;
+            }
+
+            main {
+                margin-top: 22px;
+                padding: 0 12px;
+            }
+
+            .toolbar input,
+            .toolbar select,
+            .toolbar button {
+                width: 100%;
+            }
+
+            .card {
+                padding: 18px;
+            }
+
+            .chart-container {
+                height: 260px;
+            }
+        }
+    </style>
+
+    <!-- Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+</head>
+
+<body>
+    <header>
+        <h1>TrackWise</h1>
+        <p>Customer Event Integration and Monitoring Platform</p>
+    </header>
+
+    <main>
+        <div class="section-title">
+            <h2>Event Monitoring Dashboard</h2>
+            <p>View, filter and monitor customer events received by TrackWise.</p>
+        </div>
+
+        <!-- General Statistics -->
+        <section class="stats">
+            <div class="card">
+                <p>Total Events</p>
+                <h3 id="totalEvents">0</h3>
+            </div>
+
+            <div class="card">
+                <p>Unique Users</p>
+                <h3 id="uniqueUsers">0</h3>
+            </div>
+
+            <div class="card">
+                <p>Event Types</p>
+                <h3 id="eventTypes">0</h3>
+            </div>
+
+            <div class="card">
+                <p>Total Errors</p>
+                <h3 id="totalErrors">0</h3>
+            </div>
+        </section>
+
+        <!-- Product Analytics -->
+        <section class="analytics-section">
+            <h2>Product Analytics</h2>
+
+            <div class="stats">
+                <div class="card">
+                    <p>Total Product Views</p>
+                    <h3 id="analyticsViews">0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Total Purchases</p>
+                    <h3 id="analyticsPurchases">0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Most-Viewed Product</p>
+                    <h3 id="mostViewedProduct">-</h3>
+                </div>
+
+                <div class="card">
+                    <p>Views of Most-Viewed Product</p>
+                    <h3 id="mostViewedCount">0</h3>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-grid">
+                <div class="card chart-card">
+                    <h2>Product Views vs Purchases</h2>
+                    <div class="chart-container">
+                        <canvas id="productComparisonChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card chart-card">
+                    <h2>Product Views Distribution</h2>
+                    <div class="chart-container">
+                        <canvas id="productViewsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Product Performance Table -->
+            <div class="card">
+                <h2 style="margin-bottom: 18px;">Product Performance</h2>
+
+                <p id="analyticsMessage" class="analytics-message">
+                    Loading product analytics...
+                </p>
+
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product ID</th>
+                                <th>Total Views</th>
+                                <th>Total Purchases</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productAnalyticsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Event Processing Monitor -->
+        <section class="analytics-section">
+            <h2>Event Processing Monitor</h2>
+
+            <div class="stats">
+                <div class="card">
+                    <p>Total Attempts</p>
+                    <h3 id="totalAttempts">0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Accepted Events</p>
+                    <h3 id="acceptedAttempts">0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Duplicate Events</p>
+                    <h3 id="duplicateAttempts">0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Rejected Requests</p>
+                    <h3 id="rejectedAttempts">0</h3>
+                </div>
+
+                <div class="card">
+                    <p>Acceptance Rate</p>
+                    <h3 id="acceptanceRate">0%</h3>
+                </div>
+            </div>
+
+            <p id="monitoringMessage" class="analytics-message">
+                Loading event processing metrics...
+            </p>
+        </section>
+
+        <!-- Event Attempt History -->
+        <section class="card" style="margin-bottom: 28px;">
+            <h2 style="margin-bottom: 18px;">Event Attempt History</h2>
+
+            <div class="toolbar">
+                <select id="attemptOutcomeFilter">
+                    <option value="">All outcomes</option>
+                    <option value="accepted">Accepted</option>
+                    <option value="duplicate">Duplicate</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="error">Error</option>
+                </select>
+
+                <select id="attemptEventFilter">
+                    <option value="">All event types</option>
+                    <option value="product_viewed">Product Viewed</option>
+                    <option value="add_to_cart">Add to Cart</option>
+                    <option value="purchase">Purchase</option>
+                </select>
+
+                <button onclick="loadAttempts()">Apply Filters</button>
+
+                <button class="secondary-button" onclick="resetAttemptFilters()">
+                    Reset
+                </button>
+            </div>
+
+            <p id="attemptMessage" class="analytics-message">
+                Loading event attempts...
+            </p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attempt ID</th>
+                            <th>User ID</th>
+                            <th>Event Name</th>
+                            <th>Product ID</th>
+                            <th>Outcome</th>
+                            <th>HTTP Status</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attemptsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Customer Events -->
+        <section class="card">
+            <h2 style="margin-bottom: 18px;">Customer Events</h2>
+
+            <div class="toolbar">
+                <input
+                    type="text"
+                    id="userFilter"
+                    placeholder="Filter by user ID"
+                >
+
+                <select id="eventFilter">
+                    <option value="">All event types</option>
+                    <option value="product_viewed">Product Viewed</option>
+                    <option value="add_to_cart">Add to Cart</option>
+                    <option value="purchase">Purchase</option>
+                </select>
+
+                <button onclick="loadEvents()">Apply Filters</button>
+
+                <button class="secondary-button" onclick="resetFilters()">
+                    Reset
+                </button>
+            </div>
+
+            <p id="message">Loading events...</p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Event Name</th>
+                            <th>Product ID</th>
+                            <th>Created At</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eventsTable"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Error Monitoring -->
+<section class="error-section">
+    <h2>Error Monitoring</h2>
+
+    <div class="toolbar">
+        <input
+            type="text"
+            id="errorUserFilter"
+            placeholder="Filter by user ID"
+        >
+
+        <select id="errorEventFilter">
+            <option value="">All event types</option>
+            <option value="product_viewed">Product Viewed</option>
+            <option value="add_to_cart">Add to Cart</option>
+            <option value="purchase">Purchase</option>
+        </select>
+
+        <input
+            type="text"
+            id="errorTextFilter"
+            placeholder="Search error message"
+        >
+
+        <button onclick="loadErrors()">Apply Filters</button>
+
+        <button
+            class="secondary-button"
+            onclick="resetErrorFilters()"
+        >
+            Reset
+        </button>
+    </div>
+
+    <p id="errorMessage" class="analytics-message">
+        Loading errors...
+    </p>
+
+    <div class="error-table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User ID</th>
+                    <th>Event Name</th>
+                    <th>Error Message</th>
+                    <th>Timestamp</th>
+                </tr>
+            </thead>
+            <tbody id="errorsTable"></tbody>
+        </table>
+    </div>
+</section>
+
+    <footer>
+        TrackWise | Customer Event Monitoring
+    </footer>
+
+    <script>
+        // Chart instances are created once and updated on each refresh.
+        let productComparisonChart = null;
+        let productViewsChart = null;
+
+        function updateAnalyticsCharts(products) {
+            const message = document.getElementById("analyticsMessage");
+
+            if (typeof Chart === "undefined") {
+                message.textContent =
+                    "Charts could not load. Check your internet connection and refresh the page.";
+                console.error("Chart.js is not available.");
+                return;
+            }
+
+            const safeProducts = Array.isArray(products) ? products : [];
+
+            const labels = safeProducts.map(
+                product => String(product.product_id ?? "Unknown")
+            );
+
+            const views = safeProducts.map(
+                product => Number(product.views) || 0
+            );
+
+            const purchases = safeProducts.map(
+                product => Number(product.purchases) || 0
+            );
+
+            const comparisonCanvas =
+                document.getElementById("productComparisonChart");
+
+            const viewsCanvas =
+                document.getElementById("productViewsChart");
+
+            if (!comparisonCanvas || !viewsCanvas) {
+                console.error("Chart canvas elements were not found.");
+                return;
+            }
+
+            // Bar chart: compare views and purchases.
+            if (productComparisonChart === null) {
+                productComparisonChart = new Chart(comparisonCanvas, {
+                    type: "bar",
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Views",
+                                data: views,
+                                backgroundColor: "#2563eb"
+                            },
+                            {
+                                label: "Purchases",
+                                data: purchases,
+                                backgroundColor: "#16a34a"
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    precision: 0
+                                }
+                            }
+                        }
+                    }
+                });
+            } else {
+                productComparisonChart.data.labels = labels;
+                productComparisonChart.data.datasets[0].data = views;
+                productComparisonChart.data.datasets[1].data = purchases;
+                productComparisonChart.update();
+            }
+
+            // Doughnut chart: show each product's share of views.
+            if (productViewsChart === null) {
+                productViewsChart = new Chart(viewsCanvas, {
+                    type: "doughnut",
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: "Product Views",
+                                data: views,
+                                backgroundColor: [
+                                    "#2563eb",
+                                    "#16a34a",
+                                    "#f59e0b",
+                                    "#dc2626",
+                                    "#7c3aed",
+                                    "#0891b2",
+                                    "#db2777",
+                                    "#65a30d",
+                                    "#ea580c",
+                                    "#4f46e5",
+                                    "#0d9488",
+                                    "#9333ea"
+                                ],
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: "bottom"
+                            }
+                        }
+                    }
+                });
+            } else {
+                productViewsChart.data.labels = labels;
+                productViewsChart.data.datasets[0].data = views;
+                productViewsChart.update();
+            }
+        }
+
+        async function loadEvents() {
+            const message = document.getElementById("message");
+            const table = document.getElementById("eventsTable");
+
+            message.textContent = "Loading events...";
+            table.replaceChildren();
+
+            const userId =
+                document.getElementById("userFilter").value.trim();
+
+            const eventName =
+                document.getElementById("eventFilter").value;
+
+            const params = new URLSearchParams();
+
+            if (userId) {
+                params.set("user_id", userId);
+            }
+
+            if (eventName) {
+                params.set("event_name", eventName);
+            }
+
+            try {
+                const response = await fetch(
+                    "/api/events?" + params.toString()
+                );
+
+                if (!response.ok) {
+                    throw new Error("Could not retrieve events.");
+                }
+
+                const data = await response.json();
+                const events = data.events || [];
+
+                // Load unfiltered data for the overall KPI cards.
+                const statsResponse = await fetch("/api/events");
+
+                if (!statsResponse.ok) {
+                    throw new Error("Could not retrieve overall event statistics.");
+                }
+
+                const statsData = await statsResponse.json();
+                const allEvents = statsData.events || [];
+
+                document.getElementById("totalEvents").textContent =
+                    allEvents.length;
+
+                document.getElementById("uniqueUsers").textContent =
+                    new Set(allEvents.map(event => event.user_id)).size;
+
+                document.getElementById("eventTypes").textContent =
+                    new Set(allEvents.map(event => event.event_name)).size;
+
+                if (events.length === 0) {
+                    message.textContent = "No events found.";
+                } else {
+                    message.textContent =
+                        events.length + " event(s) found.";
+
+                    events.forEach(event => {
+                        const row = document.createElement("tr");
+
+                        [
+                            event.id,
+                            event.user_id,
+                            event.event_name,
+                            event.product_id || "-",
+                            event.created_at || "-"
+                        ].forEach(value => {
+                            const cell = document.createElement("td");
+                            cell.textContent = value;
+                            row.appendChild(cell);
+                        });
+
+                        const statusCell = document.createElement("td");
+                        const status = document.createElement("span");
+
+                        status.className = "status";
+                        status.textContent = "Stored";
+
+                        statusCell.appendChild(status);
+                        row.appendChild(statusCell);
+                        table.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                message.textContent =
+                    "Unable to load events. Check that the Flask server is running.";
+
+                console.error("Events error:", error);
+            }
+
+            await loadErrors();
+        }
+
+        async function loadErrors() {
+    const errorTable = document.getElementById("errorsTable");
+    const errorMessage = document.getElementById("errorMessage");
+    const totalErrors = document.getElementById("totalErrors");
+
+    const userFilter = document
+        .getElementById("errorUserFilter")
+        .value.trim()
+        .toLowerCase();
+
+    const eventFilter = document
+        .getElementById("errorEventFilter")
+        .value;
+
+    const textFilter = document
+        .getElementById("errorTextFilter")
+        .value.trim()
+        .toLowerCase();
+
+    errorMessage.textContent = "Loading errors...";
+    errorTable.replaceChildren();
+
+    try {
+        const response = await fetch("/api/errors");
+
+        if (!response.ok) {
+            throw new Error("Could not retrieve errors.");
+        }
+
+        const data = await response.json();
+        const errors = Array.isArray(data.errors)
+            ? data.errors
+            : [];
+
+        // Keep the KPI based on all recorded errors.
+        totalErrors.textContent =
+            data.total_errors ?? errors.length;
+
+        // Apply filters in the browser without changing the API.
+        const filteredErrors = errors.filter(error => {
+            const userId = String(error.user_id ?? "").toLowerCase();
+            const eventName = String(error.event_name ?? "");
+            const errorText = String(error.error_message ?? "").toLowerCase();
+
+            const matchesUser =
+                !userFilter || userId.includes(userFilter);
+
+            const matchesEvent =
+                !eventFilter || eventName === eventFilter;
+
+            const matchesText =
+                !textFilter || errorText.includes(textFilter);
+
+            return matchesUser && matchesEvent && matchesText;
+        });
+
+        if (filteredErrors.length === 0) {
+            errorMessage.textContent = errors.length === 0
+                ? "No errors recorded."
+                : "No errors match your filters.";
+
+            return;
+        }
+
+        errorMessage.textContent =
+            `Showing ${filteredErrors.length} of ${errors.length} error(s).`;
+
+        filteredErrors.forEach(error => {
+            const row = document.createElement("tr");
+
+            [
+                error.id,
+                error.user_id || "-",
+                error.event_name || "-",
+                error.error_message || "-",
+                error.created_at || "-"
+            ].forEach(value => {
+                const cell = document.createElement("td");
+                cell.textContent = value;
+                row.appendChild(cell);
+            });
+
+            errorTable.appendChild(row);
+        });
+
+    } catch (error) {
+        errorMessage.textContent =
+            "Unable to load error records. Check the Flask server.";
+
+        console.error("Errors error:", error);
+    }
+}
+
+function resetErrorFilters() {
+    document.getElementById("errorUserFilter").value = "";
+    document.getElementById("errorEventFilter").value = "";
+    document.getElementById("errorTextFilter").value = "";
+
+    loadErrors();
+}
+
+        async function loadAnalytics() {
+            const analyticsMessage =
+                document.getElementById("analyticsMessage");
+
+            const productTable =
+                document.getElementById("productAnalyticsTable");
+
+            try {
+                const response = await fetch("/api/analytics");
+
+                if (!response.ok) {
+                    throw new Error("Could not retrieve product analytics.");
+                }
+
+                const data = await response.json();
+                const products = Array.isArray(data.products)
+                    ? data.products
+                    : [];
+
+                document.getElementById("analyticsViews").textContent =
+                    data.summary?.total_views ?? 0;
+
+                document.getElementById("analyticsPurchases").textContent =
+                    data.summary?.total_purchases ?? 0;
+
+                if (data.most_viewed_product) {
+                    document.getElementById("mostViewedProduct").textContent =
+                        data.most_viewed_product.product_id;
+
+                    document.getElementById("mostViewedCount").textContent =
+                        data.most_viewed_product.view_count;
+                } else {
+                    document.getElementById("mostViewedProduct").textContent =
+                        "-";
+
+                    document.getElementById("mostViewedCount").textContent =
+                        "0";
+                }
+
+                // Update both charts using the latest API data.
+                updateAnalyticsCharts(products);
+
+                productTable.replaceChildren();
+
+                if (products.length === 0) {
+                    analyticsMessage.textContent =
+                        "No product analytics available yet.";
+                    return;
+                }
+
+                analyticsMessage.textContent =
+                    products.length + " product(s) analysed.";
+
+                products.forEach(product => {
+                    const row = document.createElement("tr");
+
+                    [
+                        product.product_id,
+                        product.views,
+                        product.purchases
+                    ].forEach(value => {
+                        const cell = document.createElement("td");
+                        cell.textContent = value;
+                        row.appendChild(cell);
+                    });
+
+                    productTable.appendChild(row);
+                });
+            } catch (error) {
+                analyticsMessage.textContent =
+                    "Unable to load analytics. Check the Flask server.";
+
+                console.error("Analytics error:", error);
+            }
+        }
+
+        async function loadMonitoring() {
+            const message =
+                document.getElementById("monitoringMessage");
+
+            try {
+                const response = await fetch("/api/monitoring");
+
+                if (!response.ok) {
+                    throw new Error("Could not retrieve monitoring metrics.");
+                }
+
+                const data = await response.json();
+
+                document.getElementById("totalAttempts").textContent =
+                    data.total_attempts ?? 0;
+
+                document.getElementById("acceptedAttempts").textContent =
+                    data.accepted ?? 0;
+
+                document.getElementById("duplicateAttempts").textContent =
+                    data.duplicates ?? 0;
+
+                document.getElementById("rejectedAttempts").textContent =
+                    data.rejected ?? 0;
+
+                document.getElementById("acceptanceRate").textContent =
+                    (data.acceptance_rate_percent ?? 0) + "%";
+
+                message.textContent =
+                    "Event processing metrics updated successfully.";
+            } catch (error) {
+                message.textContent =
+                    "Unable to load monitoring metrics.";
+
+                console.error("Monitoring error:", error);
+            }
+        }
+
+        async function loadAttempts() {
+            const message = document.getElementById("attemptMessage");
+            const table = document.getElementById("attemptsTable");
+
+            message.textContent = "Loading event attempts...";
+            table.replaceChildren();
+
+            const outcome =
+                document.getElementById("attemptOutcomeFilter").value;
+
+            const eventName =
+                document.getElementById("attemptEventFilter").value;
+
+            const params = new URLSearchParams();
+
+            if (outcome) {
+                params.set("outcome", outcome);
+            }
+
+            if (eventName) {
+                params.set("event_name", eventName);
+            }
+
+            try {
+                const response = await fetch(
+                    "/api/attempts?" + params.toString()
+                );
+
+                if (!response.ok) {
+                    throw new Error("Could not retrieve event attempts.");
+                }
+
+                const data = await response.json();
+                const attempts = data.attempts || [];
+
+                if (attempts.length === 0) {
+                    message.textContent =
+                        "No matching event attempts found.";
+                    return;
+                }
+
+                message.textContent =
+                    attempts.length + " attempt(s) found.";
+
+                attempts.forEach(attempt => {
+                    const row = document.createElement("tr");
+
+                    [
+                        attempt.id,
+                        attempt.user_id || "-",
+                        attempt.event_name || "-",
+                        attempt.product_id || "-"
+                    ].forEach(value => {
+                        const cell = document.createElement("td");
+                        cell.textContent = value;
+                        row.appendChild(cell);
+                    });
+
+                    const outcomeCell = document.createElement("td");
+                    const outcomeBadge = document.createElement("span");
+
+                    outcomeBadge.className =
+                        "outcome outcome-" + attempt.outcome;
+
+                    outcomeBadge.textContent = attempt.outcome;
+                    outcomeCell.appendChild(outcomeBadge);
+                    row.appendChild(outcomeCell);
+
+                    const statusCell = document.createElement("td");
+                    statusCell.textContent = attempt.status_code;
+                    row.appendChild(statusCell);
+
+                    const timestampCell = document.createElement("td");
+                    timestampCell.textContent = attempt.created_at || "-";
+                    row.appendChild(timestampCell);
+
+                    table.appendChild(row);
+                });
+            } catch (error) {
+                message.textContent =
+                    "Unable to load event attempts. Check the API endpoint.";
+
+                console.error("Attempt history error:", error);
+            }
+        }
+
+        function resetFilters() {
+            document.getElementById("userFilter").value = "";
+            document.getElementById("eventFilter").value = "";
+            loadEvents();
+        }
+
+        function resetAttemptFilters() {
+            document.getElementById("attemptOutcomeFilter").value = "";
+            document.getElementById("attemptEventFilter").value = "";
+            loadAttempts();
+        }
+
+        // Initial dashboard loading.
+        loadEvents();
+        loadAnalytics();
+        loadMonitoring();
+        loadAttempts();
+
+        // Refresh dashboard data every five seconds.
+        setInterval(loadEvents, 5000);
+        setInterval(loadAnalytics, 5000);
+        setInterval(loadMonitoring, 5000);
+        setInterval(loadAttempts, 5000);
+    </script>
+</body>
+</html>
