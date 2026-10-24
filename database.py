@@ -28,6 +28,7 @@ def get_connection():
         DATABASE_NAME,
         timeout=5
     )
+    connection.row_factory = sqlite3.Row
     return connection
 
 def execute_query(cursor, query, parameters=()):

@@ -252,7 +252,6 @@ def receive_event():
 @app.route("/api/events", methods=["GET"])
 def get_events():
     connection = get_connection()
-    connection.row_factory = sqlite3.Row
 
     try:
         cursor = connection.cursor()
@@ -294,7 +293,6 @@ def get_events():
 @app.route("/api/analytics", methods=["GET"])
 def get_analytics():
     connection = get_connection()
-    connection.row_factory = sqlite3.Row
 
     try:
         cursor = connection.cursor()
@@ -356,11 +354,9 @@ def get_analytics():
 @app.route("/api/monitoring", methods=["GET"])
 def get_monitoring():
     connection = get_connection()
-    connection.row_factory = sqlite3.Row
 
     try:
         cursor = connection.cursor()
-
         cursor.execute("""
             SELECT
                 COUNT(*) AS total_attempts,
@@ -414,7 +410,6 @@ def get_monitoring():
 @app.route("/api/attempts", methods=["GET"])
 def get_event_attempts():
     connection = get_connection()
-    connection.row_factory = sqlite3.Row
 
     try:
         cursor = connection.cursor()
@@ -447,7 +442,6 @@ def get_event_attempts():
             parameters.append(event_name)
 
         query += " ORDER BY id DESC"
-
         execute_query(cursor, query, parameters)
         attempts = [dict(row) for row in cursor.fetchall()]
 
@@ -463,8 +457,6 @@ def get_event_attempts():
 @app.route("/api/errors", methods=["GET"])
 def get_event_errors():
     connection = get_connection()
-    connection.row_factory = sqlite3.Row
-
     try:
         cursor = connection.cursor()
 
