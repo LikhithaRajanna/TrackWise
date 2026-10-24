@@ -10,10 +10,9 @@ The dashboard provides a visual overview of event analytics and monitoring infor
 
 ## Live Application
 
-- TrackWise home page
-- TrackWise dashboard
-- TrackWise health check
-- 
+- [Open TrackWise Dashboard](https://trackwise-q7kb.onrender.com/dashboard)
+- [Open TrackWise Live Application](https://trackwise-q7kb.onrender.com)
+
 ## Features Demonstrated
 
 - Event analytics and monitoring
